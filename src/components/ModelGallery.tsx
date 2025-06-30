@@ -15,6 +15,7 @@ import {
   POKEMON_WITH_VARIANTS,
   capitalizePokemonName,
 } from '../utils/pokemonUtils';
+import { useNavigate } from 'react-router';
 
 interface PokemonModel {
   id: string;
@@ -28,6 +29,9 @@ interface PokemonModel {
 
 
 const ModelGallery = () => {
+  // Add navigate hook
+  const navigate = useNavigate();
+  
   const [models, setModels] = useState<PokemonModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -82,6 +86,7 @@ const ModelGallery = () => {
         const modelList = modelArrays.flat();
         
         setModels(modelList);
+        console.log("Loaded Pokémon models:", models.length);
       } catch (err) {
         console.error("Failed to load Pokémon data:", err);
         setError("Failed to load Pokémon data");
@@ -143,6 +148,11 @@ const ModelGallery = () => {
     };
   }, []);
 
+  // Add click handler function
+  const handlePokemonClick = (name: string) => {
+    navigate(`/Pokedex/${name}`);
+  };
+  
   if (loading) {
     return (
       <Box sx={{ py: 4, textAlign: 'center' }}>
@@ -196,6 +206,13 @@ const ModelGallery = () => {
                       overflow: 'hidden',
                       borderRadius: 2,
                       height: '100%',
+                      // Add hover and cursor styles
+                      cursor: 'pointer',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: (theme) => `0 8px 16px ${theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.15)'}`,
+                      },
                       // only maxHeight when expanded
                       ...(expandedStats[models[index].id] === true && {
                         maxHeight: {
@@ -204,6 +221,7 @@ const ModelGallery = () => {
                         }
                       })
                     }}
+                    onClick={() => handlePokemonClick(models[index].name.split(' ')[0].toLowerCase())}
                   >
                     <Box sx={{ 
                       position: 'relative',
@@ -221,6 +239,7 @@ const ModelGallery = () => {
                         autoRotate={true}
                         scale={0.8}
                         lowerDetailWhenIdle={true}
+                        pokemonType={models[index].apiData?.types.map((typeInfo: any) => typeInfo.type.name) || ['normal']}
                       />
                     </Box>
                     
