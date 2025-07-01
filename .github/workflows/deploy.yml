@@ -27,7 +27,7 @@ jobs:
         env:
           # These environment variables tell TypeScript and ESLint to ignore warnings, remove when final
           CI: false
-          BASE_URL: ./
+          BASE_URL: /DexBuilder/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
