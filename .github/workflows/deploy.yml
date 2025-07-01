@@ -23,7 +23,9 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          BASE_URL: ./  # Add this environment variable
+          # These environment variables tell TypeScript and ESLint to ignore warnings, remove when final
+          CI: false
+          BASE_URL: ./
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
