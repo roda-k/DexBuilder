@@ -104,7 +104,8 @@ const PokemonDetail = () => {
   
   const paddedId = String(pokemonData.id).padStart(4, '0');
   // use window.location.origin to construct absolute URL
-  const modelPath = `${window.location.origin}/glbs/${paddedId}.glb`;
+  // const modelPath = `${window.location.origin}/glbs/${paddedId}.glb`;
+  const modelPath = `${import.meta.env.BASE_URL}glbs/${paddedId}.glb`
   
   const englishFlavorText = pokemonData.speciesData?.flavor_text_entries?.find(
     (entry: any) => entry.language.name === 'en'

@@ -48,7 +48,8 @@ const TypeIcon = ({ type, size = 36, brightnessFactor = 1 }: TypeIconProps) => {
       }}
     >
       <img 
-        src={`/icons/${normalizedType}.svg`}
+        // src={`/icons/${normalizedType}.svg`}
+        src={`${import.meta.env.BASE_URL}icons/${normalizedType}.svg`}
         alt={`${type} type`}
         style={{
           width: '70%',
