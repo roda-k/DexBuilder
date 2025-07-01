@@ -17,15 +17,15 @@ export const formatStatName = (statName: string): string => {
 
 export const getStatColor = (statName: string): string => {
   const statColors: {[key: string]: string} = {
-    'hp': '#FF5959',           // Slightly brightened
-    'attack': '#FF9839',       // More orange-red
-    'defense': '#FFDC53',      // Brighter yellow
-    'special-attack': '#7DB9FF', // Brighter blue
-    'special-defense': '#9BEA79', // Brighter green
-    'speed': '#FF73A0'         // Brighter pink
+    'hp': '#FF5959',
+    'attack': '#FF9839',
+    'defense': '#FFDC53',
+    'special-attack': '#7DB9FF',
+    'special-defense': '#9BEA79',
+    'speed': '#FF73A0'
   };
   
-  return statColors[statName] || '#FF5959'; // Default to HP color
+  return statColors[statName] || '#FF5959';
 };
 
 export const capitalizePokemonName = (name: string): string => {

@@ -12,8 +12,8 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import TypeIcon from './ui/TypeIcon'; // Import your existing TypeIcon component
-import { TYPE_COLORS } from './ui/TypeIcon'; // Import the color mapping directly if possible
+import TypeIcon from './ui/TypeIcon';
+import { TYPE_COLORS } from './ui/TypeIcon';
 import useKeyboardNavigation from '../hooks/useKeyboardNavigation';
 
 interface SearchBarProps {
@@ -23,7 +23,7 @@ interface SearchBarProps {
   delay?: number;
   sx?: any;
   showTypeFilters?: boolean;
-  enableKeyboardShortcuts?: boolean; // Add this prop
+  enableKeyboardShortcuts?: boolean;
 }
 
 const POKEMON_TYPES = [
@@ -59,13 +59,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
     enableGlobalShortcut: enableKeyboardShortcuts,
   });
 
-  // Handle search with debounce
   useEffect(() => {
     const timer = setTimeout(() => {
-      // Construct search query for exact type matching
       let query = searchTerm;
       if (selectedTypes.length > 0) {
-        // Use a special syntax that your search handler will recognize for exact matching
         query = `${query} exacttype:${selectedTypes.join(',')}`;
       }
       onSearch(query);
@@ -74,20 +71,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
     return () => clearTimeout(timer);
   }, [searchTerm, selectedTypes, delay, onSearch]);
 
-  // Modify the toggleTypeFilter function to limit to 2 types
   const toggleTypeFilter = (type: string) => {
     setSelectedTypes(prev => {
-      // If the type is already selected, remove it
       if (prev.includes(type)) {
         return prev.filter(t => t !== type);
       }
-      // If we already have 2 types selected and trying to add more
       else if (prev.length >= 2) {
-        // Optional: Show a toast or notification here
-        console.log("Maximum of 2 types can be selected");
-        return prev; // Don't change the selection
+        // console.log("Maximum of 2 types can be selected"); commented debug purposes, need a potential error handler here
+        return prev;
       }
-      // Otherwise add the new type
       else {
         return [...prev, type];
       }
@@ -95,7 +87,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <Box sx={{ width: '100%', mb: 0 }}> {/* Removed mb: 3 */}
+    <Box sx={{ width: '100%', mb: 0 }}>
       <TextField
         inputRef={inputRef}
         fullWidth
@@ -103,6 +95,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder={placeholder}
+        // Inputprop deprecated, change it later
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -140,7 +133,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
         sx={{ mb: 0 }}
       />
 
-      {/* Move type filters to a popup/popover with icons */}
       {showTypeFilters && showFilters && (
         <Popover
           open={showFilters}
@@ -170,7 +162,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
               {POKEMON_TYPES.map(type => {
                 const isSelected = selectedTypes.includes(type);
                 const typeColor = TYPE_COLORS[type.toLowerCase()] || '#A0A29F';
-                // Determine if this type can be selected (either it's already selected or we have fewer than 2 types selected)
                 const canBeSelected = isSelected || selectedTypes.length < 2;
 
                 return (
@@ -186,8 +177,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                         cursor: canBeSelected ? 'pointer' : 'not-allowed',
                         transition: 'all 0.2s',
                         bgcolor: isSelected ? `${typeColor}15` : 'transparent',
-                        opacity: canBeSelected ? 1 : 0.5, // Dim types that can't be selected
-                        // Add a subtle glow effect when selected
+                        opacity: canBeSelected ? 1 : 0.5,
                         boxShadow: isSelected ? `0 0 8px ${typeColor}88` : 'none',
                         '&:hover': canBeSelected ? {
                           bgcolor: isSelected ? `${typeColor}22` : 'rgba(0,0,0,0.04)',
@@ -204,7 +194,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
                             '50%': { transform: 'scale(1.05)' },
                             '100%': { transform: 'scale(1)' }
                           },
-                          // Add a subtle glow behind the icon
                           '&::after': isSelected ? {
                             content: '""',
                             position: 'absolute',
@@ -233,7 +222,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
                           textTransform: 'capitalize',
                           fontWeight: isSelected ? 600 : 400,
                           color: isSelected ? typeColor : 'text.secondary',
-                          // Add text glow for selected items
                           textShadow: isSelected ? `0 0 1px ${typeColor}88` : 'none',
                         }}
                       >
@@ -248,13 +236,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
         </Popover>
       )}
 
-      {/* Show selected types as pills in the main UI with icons */}
       {selectedTypes.length > 0 && (
         <Box sx={{
-          mt: 0.5,
+          mt: 0.8,
           display: 'flex',
           flexWrap: 'wrap',
-          gap: 0.5
+          gap: 0.8
         }}>
           {selectedTypes.map(type => {
             const typeColor = TYPE_COLORS[type.toLowerCase()] || '#A0A29F';
@@ -263,23 +250,33 @@ const SearchBar: React.FC<SearchBarProps> = ({
               <Chip
                 key={type}
                 label={type}
-                size="small"
+                size="medium"
                 deleteIcon={<ClearIcon fontSize="small" />}
                 onDelete={() => toggleTypeFilter(type)}
-                icon={<TypeIcon type={type} size={16} />}
+                icon={<TypeIcon type={type} size={20} />}
                 sx={{
                   textTransform: 'capitalize',
-                  height: '24px',
+                  height: '32px',
+                  padding: '0 4px',
                   backgroundColor: `${typeColor}22`,
                   color: typeColor,
                   fontWeight: 500,
                   border: `1px solid ${typeColor}44`,
+                  '& .MuiChip-label': {
+                    paddingLeft: '8px',
+                    paddingRight: '8px',
+                    fontSize: '0.875rem',
+                  },
                   '& .MuiChip-icon': {
                     color: typeColor,
-                    marginLeft: '4px'
+                    marginLeft: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   },
                   '& .MuiChip-deleteIcon': {
                     color: typeColor,
+                    marginRight: '6px',
                     '&:hover': {
                       color: `${typeColor}BB`
                     }

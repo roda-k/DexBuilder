@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router'; // Correct import
 import { 
   Box, Container, Typography, Button, Grid, Paper, 
@@ -14,13 +14,15 @@ import {
   formatStatName
 } from '../utils/pokemonUtils';
 import { fetchPokemonDetails } from '../services/pokemonDataService';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'; // A sparkle icon
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 const PokemonDetail = () => {
   const { pokemonName } = useParams<{ pokemonName: string }>();
   const [pokemonData, setPokemonData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [statAnimation, setStatAnimation] = useState(0);
+  const animationRef = useRef<number | null>(null);
   
   useEffect(() => {
     const loadPokemonData = async () => {
@@ -40,6 +42,34 @@ const PokemonDetail = () => {
     
     loadPokemonData();
   }, [pokemonName]);
+  
+  // trigger when component is stats is mounted
+  useEffect(() => {
+    if (!loading && pokemonData) {
+      let startTime: number | null = null;
+      const duration = 3000; // longer for demo, but 1200 should do it in normal use?
+      
+      const animateStats = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        setStatAnimation(progress);
+        
+        if (progress < 1) {
+          animationRef.current = requestAnimationFrame(animateStats);
+        }
+      };
+      
+      animationRef.current = requestAnimationFrame(animateStats);
+      
+      return () => {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+        }
+      };
+    }
+  }, [loading, pokemonData]);
   
   if (loading) {
     return (
@@ -72,23 +102,19 @@ const PokemonDetail = () => {
     );
   }
   
-  // Calculate Pokemon ID and model path
   const paddedId = String(pokemonData.id).padStart(4, '0');
-  // Use window.location.origin to construct absolute URL
+  // use window.location.origin to construct absolute URL
   const modelPath = `${window.location.origin}/glbs/${paddedId}.glb`;
   
-  // Get Pokemon description
   const englishFlavorText = pokemonData.speciesData?.flavor_text_entries?.find(
     (entry: any) => entry.language.name === 'en'
   )?.flavor_text?.replace(/\f/g, ' ').replace(/\n/g, ' ') || "No description available";
   
-  // Get all Pokémon types
   const pokemonTypes = pokemonData.types.map((typeInfo: any) => typeInfo.type.name);
-  console.log("Pokémon types extracted:", pokemonTypes);
+  // console.log("Pokémon types extracted:", pokemonTypes); commented, debugging purposes
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Back button */}
       <Button 
         component={Link} 
         to="/Pokedex" 
@@ -105,8 +131,7 @@ const PokemonDetail = () => {
       </Button>
       
       <Grid container spacing={4}>
-        {/* Left column - 3D Model & Description */}
-        <Grid size={{xs:12, md:5}}> {/* Correct Grid syntax */}
+        <Grid size={{xs:12, md:5}}>
           <Paper 
             elevation={3}
             sx={{ 
@@ -122,13 +147,13 @@ const PokemonDetail = () => {
               height="100%"
               autoRotate={true}
               scale={1.2}
-              pokemonType={pokemonTypes} // Ensure this has the correct types
+              pokemonType={pokemonTypes}
             />
           </Paper>
           
           <Paper sx={{ p: 3, borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom>
-              About
+              Description
             </Typography>
             <Typography variant="body2" paragraph>
               {englishFlavorText}
@@ -136,8 +161,7 @@ const PokemonDetail = () => {
           </Paper>
         </Grid>
         
-        {/* Right column - Pokemon Details */}
-        <Grid size={{xs:12, md:7}}> {/* Correct Grid syntax */}
+        <Grid size={{xs:12, md:7}}>
           <Box sx={{ mb: 3 }}>
             <Typography 
               variant="h3" 
@@ -154,7 +178,6 @@ const PokemonDetail = () => {
               {formatPokemonNumber(paddedId)}
             </Typography>
             
-            {/* Types */}
             <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
               {pokemonData.types.map((typeInfo: any) => (
                 <TypeIcon 
@@ -167,60 +190,84 @@ const PokemonDetail = () => {
             </Box>
           </Box>
           
-          {/* Stats */}
           <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom>
               Base Stats
             </Typography>
             
-            {pokemonData.stats.map((stat: any) => (
-              <Box key={stat.stat.name} sx={{ mb: 2 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                  <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
-                    {formatStatName(stat.stat.name)}
-                  </Typography>
-                  <Typography variant="body2" fontWeight="bold">
-                    {stat.base_stat}
-                  </Typography>
+            {pokemonData.stats.map((stat: any) => {
+              const animatedValue = Math.round(stat.base_stat * statAnimation);
+              const animatedWidth = `${Math.min((stat.base_stat / 255) * 100 * statAnimation, 100)}%`;
+              
+              return (
+                <Box key={stat.stat.name} sx={{ mb: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                    <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+                      {formatStatName(stat.stat.name)}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      fontWeight="bold"
+                      sx={{ 
+                        width: '30px', 
+                        textAlign: 'right',
+                        transition: 'color 0.3s ease',
+                        color: statAnimation === 1 && stat.base_stat > 100 ? getStatColor(stat.stat.name) : 'inherit',
+                      }}
+                    >
+                      {animatedValue}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ 
+                    height: 10, 
+                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: 2, 
+                    overflow: 'hidden' 
+                  }}>
+                    <Box 
+                      sx={{ 
+                        height: '100%', 
+                        width: animatedWidth,
+                        bgcolor: getStatColor(stat.stat.name),
+                        borderRadius: 2,
+                        transition: 'box-shadow 0.3s ease',
+                        boxShadow: statAnimation === 1 && stat.base_stat > 100 ? 
+                          `0 0 8px ${getStatColor(stat.stat.name)}` : 'none',
+                      }} 
+                    />
+                  </Box>
                 </Box>
-                <Box sx={{ 
-                  height: 10, 
-                  bgcolor: 'rgba(255, 255, 255, 0.1)',
-                  borderRadius: 2, 
-                  overflow: 'hidden' 
-                }}>
-                  <Box 
-                    sx={{ 
-                      height: '100%', 
-                      width: `${Math.min((stat.base_stat / 255) * 100, 100)}%`,
-                      bgcolor: getStatColor(stat.stat.name),
-                      borderRadius: 2
-                    }} 
-                  />
-                </Box>
-              </Box>
-            ))}
+              );
+            })}
             
             <Divider sx={{ my: 2 }} />
             
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
               <Typography variant="body2">Total</Typography>
-              <Typography variant="body2" fontWeight="bold">
-                {pokemonData.stats.reduce((sum: number, stat: any) => sum + stat.base_stat, 0)}
+              <Typography 
+                variant="body2" 
+                fontWeight="bold"
+                sx={{
+                  transition: 'color 0.3s ease',
+                  color: statAnimation === 1 ? 'primary.main' : 'inherit',
+                }}
+              >
+                {Math.round(pokemonData.stats.reduce(
+                  (sum: number, stat: any) => sum + stat.base_stat, 0
+                ) * statAnimation)}
               </Typography>
             </Box>
           </Paper>
           
-          {/* Additional Details */}
           <Grid container spacing={3}>
-            <Grid size={{xs:12, md:6}}> {/* Correct Grid syntax */}
+            <Grid size={{xs:12, md:6}}>
               <Paper sx={{ p: 3, borderRadius: 2, height: '100%' }}>
                 <Typography variant="h6" gutterBottom>
                   Physical Details
                 </Typography>
                 
                 <Grid container spacing={2}>
-                  <Grid size={{xs:6}}> {/* Correct Grid syntax */}
+                  <Grid size={{xs:6}}>
                     <Typography color="text.secondary" variant="body2">
                       Height
                     </Typography>
@@ -229,7 +276,7 @@ const PokemonDetail = () => {
                     </Typography>
                   </Grid>
                   
-                  <Grid size={{xs:6}}> {/* Correct Grid syntax */}
+                  <Grid size={{xs:6}}>
                     <Typography color="text.secondary" variant="body2">
                       Weight
                     </Typography>
@@ -238,7 +285,7 @@ const PokemonDetail = () => {
                     </Typography>
                   </Grid>
                   
-                  <Grid size={{xs:12}} sx={{ mt: 1 }}> {/* Correct Grid syntax */}
+                  <Grid size={{xs:12}} sx={{ mt: 1 }}>
                     <Typography color="text.secondary" variant="body2">
                       Abilities
                     </Typography>
@@ -272,7 +319,7 @@ const PokemonDetail = () => {
                                 position: 'relative',
                                 transition: 'all 0.3s ease',
                                 
-                                // Hover animations
+                                // hover animations
                                 '@keyframes pulse': {
                                   '0%': { boxShadow: '0 0 0 0 rgba(255, 61, 77, 0.7)' },
                                   '70%': { boxShadow: '0 0 0 6px rgba(255, 61, 77, 0)' },
@@ -302,14 +349,14 @@ const PokemonDetail = () => {
               </Paper>
             </Grid>
             
-            <Grid size={{xs:12, md:6}}> {/* Correct Grid syntax */}
+            <Grid size={{xs:12, md:6}}>
               <Paper sx={{ p: 3, borderRadius: 2, height: '100%' }}>
                 <Typography variant="h6" gutterBottom>
                   Training
                 </Typography>
                 
                 <Grid container spacing={2}>
-                  <Grid size={{xs:6}}> {/* Correct Grid syntax */}
+                  <Grid size={{xs:6}}>
                     <Typography color="text.secondary" variant="body2">
                       Base Exp
                     </Typography>
@@ -318,7 +365,7 @@ const PokemonDetail = () => {
                     </Typography>
                   </Grid>
                   
-                  <Grid size={{xs:6}}> {/* Correct Grid syntax */}
+                  <Grid size={{xs:6}}>
                     <Typography color="text.secondary" variant="body2">
                       Growth Rate
                     </Typography>
@@ -327,7 +374,7 @@ const PokemonDetail = () => {
                     </Typography>
                   </Grid>
                   
-                  <Grid size={{xs:12}} sx={{ mt: 1 }}> {/* Correct Grid syntax */}
+                  <Grid size={{xs:12}} sx={{ mt: 1 }}>
                     <Typography color="text.secondary" variant="body2">
                       Egg Groups
                     </Typography>

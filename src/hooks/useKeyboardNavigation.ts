@@ -23,7 +23,6 @@ const useKeyboardNavigation = ({
 }: KeyboardNavigationOptions): void => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Global focus shortcut (/)
       if (enableGlobalShortcut && 
           e.key === '/' && 
           !preventIn.includes(document.activeElement?.tagName || '')) {
@@ -31,7 +30,6 @@ const useKeyboardNavigation = ({
         inputRef.current?.focus();
       }
       
-      // Clear search with Escape when focused in search field
       if (e.key === 'Escape' && 
           document.activeElement === inputRef.current && 
           query && 

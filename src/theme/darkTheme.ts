@@ -1,14 +1,12 @@
 import { createTheme } from '@mui/material/styles';
 
-// Define red accent colors
 const accentRed = {
-  main: '#ff3d4d',       // Bright red as main accent
-  light: '#ff7071',      // Lighter shade for hover states
-  dark: '#b50016',       // Darker red for pressed states
-  contrastText: '#ffffff' // White text on red backgrounds
+  main: '#ff3d4d',
+  light: '#ff7071',
+  dark: '#b50016',
+  contrastText: '#ffffff'
 };
 
-// Create the dark theme
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
@@ -19,8 +17,8 @@ const darkTheme = createTheme({
       light: '#ff9c9c',
     },
     background: {
-      default: '#121212', // Very dark gray, almost black
-      paper: '#1e1e1e',   // Slightly lighter for cards/papers
+      default: '#121212',
+      paper: '#1e1e1e',
     },
     text: {
       primary: '#ffffff',
@@ -44,7 +42,7 @@ const darkTheme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          backgroundColor: '#1e1e1e', // Dark card background
+          backgroundColor: '#1e1e1e',
           borderRadius: 8,
         }
       }
@@ -52,16 +50,16 @@ const darkTheme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundColor: '#1e1e1e', // Dark paper background
+          backgroundColor: '#1e1e1e',
         }
       }
     },
     MuiIconButton: {
       styleOverrides: {
         root: {
-          color: '#ff3d4d', // Red icon buttons
+          color: '#ff3d4d',
           '&:hover': {
-            backgroundColor: 'rgba(255, 61, 77, 0.08)', // Subtle red hover effect
+            backgroundColor: 'rgba(255, 61, 77, 0.08)',
           }
         }
       }

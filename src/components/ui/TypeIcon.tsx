@@ -3,10 +3,9 @@ import { Box } from '@mui/material';
 interface TypeIconProps {
   type: string;
   size?: number;
-  brightnessFactor?: number; // New prop for adjusting brightness
+  brightnessFactor?: number;
 }
 
-// Type color mapping
 const TYPE_COLORS: Record<string, string> = {
   bug: '#92BC2C',
   dark: '#595761',
@@ -30,7 +29,7 @@ const TYPE_COLORS: Record<string, string> = {
 
 const TypeIcon = ({ type, size = 36, brightnessFactor = 1 }: TypeIconProps) => {
   const normalizedType = type.toLowerCase();
-  const backgroundColor = TYPE_COLORS[normalizedType] || '#A0A29F'; // Default to normal color
+  const backgroundColor = TYPE_COLORS[normalizedType] || '#A0A29F';
   
   return (
     <Box
@@ -44,18 +43,18 @@ const TypeIcon = ({ type, size = 36, brightnessFactor = 1 }: TypeIconProps) => {
         justifyContent: 'center',
         overflow: 'hidden',
         flexShrink: 0,
-        p: 0.5, // Padding to keep icon slightly smaller than circle
-        filter: `brightness(${brightnessFactor})`, // Apply brightness adjustment
+        p: 0.5,
+        filter: `brightness(${brightnessFactor})`,
       }}
     >
       <img 
         src={`/icons/${normalizedType}.svg`}
         alt={`${type} type`}
         style={{
-          width: '70%', // Make icon slightly smaller than circle
+          width: '70%',
           height: '70%',
           objectFit: 'contain',
-          filter: 'brightness(0) invert(1)', // Makes icon white
+          filter: 'brightness(0) invert(1)',
         }}
       />
     </Box>

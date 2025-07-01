@@ -19,10 +19,8 @@ const Pokedex = () => {
       backgroundColor: theme.palette.background.default,
       position: 'relative',
     }}>
-      {/* Fixed TopNavbar */}
       <TopNavbar />
       
-      {/* Main content area */}
       <Container 
         maxWidth="lg" 
         sx={{ 
@@ -34,7 +32,6 @@ const Pokedex = () => {
           minHeight: 0
         }}
       >
-        {/* Header and content */}
         <Box 
           sx={{ 
             display: 'flex', 
@@ -65,7 +62,6 @@ const Pokedex = () => {
         
         <Divider sx={{ mb: 3, opacity: 0.6 }} />
         
-        {/* Model Gallery without glass effect */}
         <Box 
           sx={{ 
             position: 'relative',
@@ -83,7 +79,6 @@ const Pokedex = () => {
         </Box>
       </Container>
       
-      {/* Dedicated fixed glass effect overlay */}
       <Box
         sx={{
           position: 'fixed',
@@ -92,10 +87,9 @@ const Pokedex = () => {
           right: 0,
           height: '150px',
           pointerEvents: 'none',
-          zIndex: 100, // Higher z-index to ensure it's on top
+          zIndex: 100,
         }}
       >
-        {/* First layer (subtle gradient) */}
         <Box
           sx={{
             position: 'absolute',
@@ -115,7 +109,6 @@ const Pokedex = () => {
           }}
         />
         
-        {/* Second layer (blur effect) */}
         <Box
           sx={{
             position: 'absolute',

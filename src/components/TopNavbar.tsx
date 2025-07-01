@@ -62,15 +62,14 @@ const TopNavbar = () => {
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
       }}
     >
-      <Container maxWidth="xl" sx={{ px: 0 }}> {/* Remove container padding */}
+      <Container maxWidth="xl" sx={{ px: 0 }}>
         <Toolbar 
           disableGutters 
           sx={{ 
             minHeight: '64px',
-            padding: 0 // Remove any default padding
+            padding: 0
           }}
         >
-          {/* App title */}
           <Typography
             variant="h6"
             component={Link}
@@ -81,7 +80,7 @@ const TopNavbar = () => {
               alignItems: 'center',
               textDecoration: 'none',
               color: 'inherit',
-              ml: 2 // Add left margin to title only
+              ml: 2
             }}
           >
             DexBuilder
@@ -120,11 +119,10 @@ const TopNavbar = () => {
                 }}
                 open={open}
                 onClose={handleClose}
-                // Replace PaperProps with slotProps
                 slotProps={{
                   paper: {
                     sx: {
-                      bgcolor: 'rgba(30, 30, 30, 0.95)', // Dark background
+                      bgcolor: 'rgba(30, 30, 30, 0.95)',
                       backdropFilter: 'blur(8px)',
                       borderRadius: 2,
                       mt: 0.5,
@@ -180,7 +178,7 @@ const TopNavbar = () => {
           ) : (
             <Box sx={{ 
               display: 'flex', 
-              height: '100%', // Ensure Box has full height
+              height: '100%',
               ml: 'auto'
             }}> 
               {navItems.map((item) => {
@@ -193,9 +191,9 @@ const TopNavbar = () => {
                     to={item.path}
                     disableRipple
                     sx={{
-                      height: '64px', // Use exact pixel height instead of 100%
-                      padding: '0 1.5rem', // Use fixed padding instead of px
-                      margin: 0, // Ensure no margins
+                      height: '64px',
+                      padding: '0 1.5rem',
+                      margin: 0,
                       borderRadius: 0,
                       transition: 'all 0.2s ease',
                       position: 'relative',
@@ -218,9 +216,9 @@ const TopNavbar = () => {
                       // Active button - pressed down effect
                       ...(isActive && {
                         background: 'linear-gradient(180deg, rgba(255,61,77,0.25) 0%, rgba(255,61,77,0.15) 100%)',
-                        boxShadow: '0 3px 5px rgba(0, 0, 0, 0.3) inset', // Inset shadow creates "pressed" look
-                        transform: 'translateY(0px)', // No raise - looks pushed down
-                        borderTop: '1px solid rgba(0, 0, 0, 0.2)', // Dark edge at top when pressed
+                        boxShadow: '0 3px 5px rgba(0, 0, 0, 0.3) inset',
+                        transform: 'translateY(0px)',
+                        borderTop: '1px solid rgba(0, 0, 0, 0.2)',
                         color: theme.palette.primary.main,
                       }),
                     }}
@@ -231,19 +229,17 @@ const TopNavbar = () => {
                       alignItems: 'center',
                       gap: 0.5
                     }}>
-                      {/* Icon above text - like a physical button */}
                       <Box sx={{ 
                         display: 'flex',
                         alignItems: 'center',
                         color: isActive ? theme.palette.primary.main : 'inherit',
                         filter: isActive ? 'drop-shadow(0 0 3px rgba(255,61,77,0.5))' : 'none',
-                        transform: isActive ? 'scale(1.2)' : 'scale(1)', // Icon grows when active
+                        transform: isActive ? 'scale(1.2)' : 'scale(1)',
                         transition: 'all 0.2s ease',
                       }}>
                         <SvgIcon src={item.icon} />
                       </Box>
                       
-                      {/* Label below icon */}
                       <Typography 
                         variant="button" 
                         sx={{

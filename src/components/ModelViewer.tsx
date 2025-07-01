@@ -11,7 +11,7 @@ import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { typeLighting, getPokemonLighting, getSofterTypeBackground } from '../utils/pokemonLighting';
 
-// Global model cache to prevent reloading the same models
+// global model cache to prevent reloading the same models
 const modelCache = new Map<string, GLTF>();
 
 interface ModelViewerProps {
@@ -38,7 +38,6 @@ function Model({ modelPath, scale, position, autoRotate }: ModelProps) {
   const [error, setError] = useState(false);
   const [hasAdjustedPosition, setHasAdjustedPosition] = useState(false);
   
-  // Make sure we import useThree from @react-three/fiber
   const { camera, controls } = useThree();
   
   useEffect(() => {
@@ -94,10 +93,9 @@ function Model({ modelPath, scale, position, autoRotate }: ModelProps) {
     return false;
   });
 
-  // Enhanced auto-positioning with camera adjustment
   useEffect(() => {
     if (model && ref.current && !hasAdjustedPosition) {
-      // Calculate bounding box
+      // calculate bounding box
       const box = new THREE.Box3().setFromObject(ref.current);
       const size = new THREE.Vector3();
       const center = new THREE.Vector3();
@@ -105,7 +103,7 @@ function Model({ modelPath, scale, position, autoRotate }: ModelProps) {
       box.getSize(size);
       box.getCenter(center);
       
-      // Center the model horizontally and vertically
+      // center model
       ref.current.position.x = position[0] - center.x;
       ref.current.position.z = position[2] - center.z;
       ref.current.position.y = position[1] - center.y;
@@ -114,12 +112,10 @@ function Model({ modelPath, scale, position, autoRotate }: ModelProps) {
       const maxDimension = Math.max(size.x, size.y, size.z);
       
       // Calculate optimal camera distance based on model size
-      const optimalDistance = maxDimension * 2.2; // Adjust multiplier as needed
+      const optimalDistance = maxDimension * 2.2; // adjust multiplier as needed
       
-      // Set camera position - this works for all camera types
       camera.position.z = Math.max(3, optimalDistance);
       
-      // Type check before setting near/far planes
       if (camera instanceof THREE.PerspectiveCamera) {
         // Now TypeScript knows this is a PerspectiveCamera
         camera.near = optimalDistance * 0.01;
@@ -127,9 +123,8 @@ function Model({ modelPath, scale, position, autoRotate }: ModelProps) {
         camera.updateProjectionMatrix();
       }
       
-      // If we have OrbitControls, reset them to look at the center
       if (controls) {
-        // Use the type guard for safer handling
+        // use the type guard for safer handling
         if (isOrbitControls(controls)) {
           controls.target.set(0, 0, 0);
           controls.update();
@@ -186,7 +181,6 @@ function AnimatedSpotlight({ type, intensity = 1.5 }: { type: string; intensity?
   
   useFrame(({ clock }) => {
     if (spotlightRef.current && targetRef.current) {
-      // Create a subtle circular motion for the spotlight
       const time = clock.getElapsedTime();
       const radius = 2.5;
       
@@ -229,11 +223,9 @@ const ModelViewer = ({
   const [isInteracting, setIsInteracting] = useState(false);
   const interactionTimer = useRef<NodeJS.Timeout | null>(null);
   
-  // Add a state to control if we're visible in viewport
   const [isInViewport, setIsInViewport] = useState(false);
   const viewportRef = useRef<HTMLDivElement>(null);
   
-  // Use IntersectionObserver to check if we're in viewport
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -249,8 +241,6 @@ const ModelViewer = ({
     return () => observer.disconnect();
   }, []);
   
-  // Determine if we should animate based on all factors
-  // If autoRotate is true, we should animate even when idle but only when visible
   const shouldAnimate = autoRotate || isInteracting || !lowerDetailWhenIdle;
   
   useEffect(() => {
@@ -271,7 +261,7 @@ const ModelViewer = ({
   
   const lighting = getPokemonLighting(types);
   
-  // Use softer backgrounds to make models stand out more
+  // softer backgrounds to make models stand out more (psychic still needs work)
   const background = getSofterTypeBackground(types);
   
   return (
@@ -283,9 +273,8 @@ const ModelViewer = ({
         borderRadius: 2,
         overflow: 'hidden',
         position: 'relative',
-        background, // Keep the type-based backgrounds
+        background,
         boxShadow: '0px 3px 15px rgba(0,0,0,0.1)',
-        // Keep the vignette effect
         '&::after': {
           content: '""',
           position: 'absolute',
@@ -301,7 +290,7 @@ const ModelViewer = ({
       }}>
       <Canvas
         camera={{ 
-          position: [0, 0, 5], // Slightly adjusted camera position
+          position: [0, 0, 5],
           fov: 40, 
           near: 0.1, 
           far: 1000
@@ -337,58 +326,49 @@ const ModelViewer = ({
             } 
             // onError={handleLoadError}
           >
-            {/* Enhanced setup with better visual elements */}
             <group>
-              {/* Increase ambient light intensity by 60% to brighten the overall scene */}
               <ambientLight 
                 color={lighting.ambientColor} 
                 intensity={lighting.ambientIntensity * 1.6} 
               />
               
-              {/* Increase main directional light - remove the reduction factor */}
               <directionalLight 
                 color={lighting.mainLight} 
                 position={[10, 10, 5]} 
-                intensity={lighting.intensity} // Remove the 0.7 reduction
+                intensity={lighting.intensity}
                 castShadow 
               />
               
-              {/* Brighter animated spotlight */}
-              <AnimatedSpotlight type={primaryType} intensity={1.8} /> {/* Increased from 1.2 */}
+              <AnimatedSpotlight type={primaryType} intensity={1.8} />
               
-              {/* Keep the rim light as is */}
               <directionalLight
                 position={[0, 0, -10]}
                 intensity={0.7}
                 color="#ffffff"
               />
               
-              {/* Add a hemisphere light for softer ambient fill */}
               <hemisphereLight 
                 color="#ffffff"
                 groundColor={lighting.ambientColor}
                 intensity={0.5} 
               />
               
-              {/* Add a subtle fill light from below to reduce harsh shadows */}
               <directionalLight
                 position={[0, -3, 0]}
                 intensity={0.2}
                 color="#ffffff"
               />
               
-              {/* Keep the contact shadows but make them slightly less prominent */}
               <ContactShadows
                 position={[0, -0.5, 0]}
-                opacity={0.25} // Reduced from 0.3
+                opacity={0.25}
                 scale={3.5}
-                blur={2.5} // Increased blur for softer shadows
+                blur={2.5}
                 far={1}
                 resolution={256}
                 color="#000000"
               />
               
-              {/* The model stays the same */}
               <Model 
                 modelPath={modelPath} 
                 scale={scale} 
@@ -398,17 +378,15 @@ const ModelViewer = ({
             </group>
           </ErrorBoundary>
           
-          {/* Add more flexible controls */}
           <OrbitControls 
             enableZoom={true}
             enablePan={false}
             minPolarAngle={0.1}
             maxPolarAngle={Math.PI / 1.75}
             dampingFactor={0.05}
-            
-            // Add these to automatically fit the view to the model
+            // automatically fit the view to the model
             makeDefault
-            target={[0, 0, 0]} // Look at center
+            target={[0, 0, 0]}
           />
         </Suspense>
       </Canvas>
@@ -423,34 +401,33 @@ export const LazyModelViewer = ({ modelPath, pokemonType, ...props }: ModelViewe
   const containerRef = useRef<HTMLDivElement>(null);
   const unloadTimerRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Track if this model is actually visible (more strict than shouldRender)
+  // more strict than shouldRender
   const [isActuallyVisible, setIsActuallyVisible] = useState(false);
   
   useEffect(() => {
-    // Outer observer with larger margin to preload
+    // larger margin to preload
     const preloadObserver = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Start loading, but don't unload immediately when scrolled away
+          // start loading, but don't unload immediately when scrolled away
           setShouldRender(true);
         } else if (!entry.isIntersecting && shouldRender) {
-          // Delay unloading to prevent flickering during normal scrolling
+          // delay unloading to prevent flickering during normal scrolling (not enough, still losing context here)
           if (unloadTimerRef.current) clearTimeout(unloadTimerRef.current);
           
           unloadTimerRef.current = setTimeout(() => {
             setShouldRender(false);
-          }, 1000); // Keep model loaded for 1 second after scrolling away
+          }, 1000);
         }
       },
-      { rootMargin: '300px 0px' } // Generous preloading margin
+      { rootMargin: '300px 0px' }
     );
     
-    // Inner observer with tighter margin to determine if truly visible
     const visibilityObserver = new IntersectionObserver(
       ([entry]) => {
         setIsActuallyVisible(entry.isIntersecting);
       },
-      { threshold: 0.1 } // Consider visible when at least 10% is shown
+      { threshold: 0.1 } //consider visible when at least 10% is shown
     );
     
     if (containerRef.current) {
@@ -465,7 +442,7 @@ export const LazyModelViewer = ({ modelPath, pokemonType, ...props }: ModelViewe
     };
   }, [shouldRender]);
 
-  // Handle model loading errors
+  // handle model loading errors
   const handleError = () => {
     console.error(`Error loading model: ${modelPath}, using fallback`);
     if (!useFallback) {
@@ -476,14 +453,13 @@ export const LazyModelViewer = ({ modelPath, pokemonType, ...props }: ModelViewe
     }
   };
   
-  // We use the actual visibility to determine whether to animate/render at full quality
+  // We use the actual visibility to determine whether to animate/render at full quality (need rework)
   const renderQuality = isActuallyVisible ? 'high' : 'low';
   
   return (
     <div ref={containerRef} style={{ height: props.height || '250px', width: '100%' }}>
       {shouldRender ? (
         fallbackFailed ? (
-          // static error element - unchanged
           <Box sx={{
             height: '100%',
             width: '100%',
@@ -502,16 +478,12 @@ export const LazyModelViewer = ({ modelPath, pokemonType, ...props }: ModelViewe
             modelPath={useFallback ? '/glbs/0000.glb' : modelPath}
             pokemonType={pokemonType}
             onError={handleError}
-            // Pass visibility status to control quality
             lowerDetailWhenIdle={!isActuallyVisible || props.lowerDetailWhenIdle}
-            // Disable auto-rotation when not actually visible
             autoRotate={isActuallyVisible && props.autoRotate}
-            // Pass through other props
             {...props}
           />
         )
       ) : (
-        // Loading placeholder - unchanged
         <Box sx={{
           height: '100%',
           width: '100%',

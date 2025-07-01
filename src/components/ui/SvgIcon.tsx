@@ -2,7 +2,7 @@ import { Box, SxProps, Theme } from '@mui/material';
 
 interface SvgIconProps {
   src: string;
-  sx?: SxProps<Theme>; // Add support for sx prop
+  sx?: SxProps<Theme>;
 }
 
 const SvgIcon = ({ src, sx }: SvgIconProps) => {
@@ -15,7 +15,6 @@ const SvgIcon = ({ src, sx }: SvgIconProps) => {
         width: '1em',
         height: '1em',
         display: 'inline-block',
-        // Spread any additional sx props
         ...(sx || {})
       }}
     />

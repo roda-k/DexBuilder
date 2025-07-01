@@ -3,9 +3,8 @@ export interface TypeLighting {
   intensity: number;
   ambientColor: string;
   ambientIntensity: number;
-  // Add these new properties
   backgroundColor: string;
-  secondaryColor: string; // For gradient effects
+  secondaryColor: string; // gradient
 }
 
 export const typeLighting: Record<string, TypeLighting> = {
@@ -207,42 +206,34 @@ export const getPokemonLighting = (types: string[], blendTypes: boolean = false)
     intensity: (primaryLighting.intensity * 0.7) + (secondaryLighting.intensity * 0.3),
     ambientColor: blendColors(primaryLighting.ambientColor, secondaryLighting.ambientColor),
     ambientIntensity: (primaryLighting.ambientIntensity * 0.7) + (secondaryLighting.ambientIntensity * 0.3),
-    // Add these two properties:
     backgroundColor: blendColors(primaryLighting.backgroundColor, secondaryLighting.backgroundColor),
     secondaryColor: blendColors(primaryLighting.secondaryColor, secondaryLighting.secondaryColor)
   };
 };
 
-// Add a function to generate CSS background based on type(s)
 export const getTypeBackground = (types: string[]): string => {
   if (!types || types.length === 0) {
     return `linear-gradient(135deg, ${typeLighting.normal.backgroundColor}, ${typeLighting.normal.secondaryColor})`;
   }
   
-  // Single type - create a gradient with its two colors
   if (types.length === 1) {
-    // Safely get the type with case insensitivity
     const typeKey = types[0].toLowerCase();
     
-    // Check if this type exists in our lighting object
     const typeExists = Object.keys(typeLighting).some(key => key.toLowerCase() === typeKey);
     if (!typeExists) {
       return `linear-gradient(135deg, ${typeLighting.normal.backgroundColor}, ${typeLighting.normal.secondaryColor})`;
     }
     
-    // Find the correct key with case insensitivity
     const actualKey = Object.keys(typeLighting).find(key => key.toLowerCase() === typeKey) || 'normal';
     const colors = typeLighting[actualKey];
     
     return `linear-gradient(135deg, ${colors.backgroundColor}, ${colors.secondaryColor})`;
   }
   
-  // Dual type - blend the primary and secondary types
   const primaryTypeKey = types[0].toLowerCase();
   const secondaryTypeKey = types[1].toLowerCase();
   
   
-  // Find the actual keys with case insensitivity
   const primaryKey = Object.keys(typeLighting).find(key => 
     key.toLowerCase() === primaryTypeKey) || 'normal';
   const secondaryKey = Object.keys(typeLighting).find(key => 
@@ -251,7 +242,6 @@ export const getTypeBackground = (types: string[]): string => {
   const primary = typeLighting[primaryKey];
   const secondary = typeLighting[secondaryKey];
   
-  // Create a diagonal gradient that shows both types
   return `linear-gradient(135deg, 
     ${primary.backgroundColor} 0%, 
     ${primary.secondaryColor} 45%, 
@@ -259,32 +249,25 @@ export const getTypeBackground = (types: string[]): string => {
     ${secondary.secondaryColor} 100%)`;
 };
 
-// Add a function to generate softer backgrounds that don't overpower the models
 export const getSofterTypeBackground = (types: string[]): string => {
   if (!types || types.length === 0) {
     return `linear-gradient(135deg, ${lightenColor(typeLighting.normal.backgroundColor, 0.3)}, ${lightenColor(typeLighting.normal.secondaryColor, 0.4)})`;
   }
   
-  // Single type - create a softer gradient with its two colors
   if (types.length === 1) {
-    // Safely get the type with case insensitivity
     const typeKey = types[0].toLowerCase();
     
-    // Find the correct key with case insensitivity
     const actualKey = Object.keys(typeLighting).find(key => key.toLowerCase() === typeKey) || 'normal';
     const colors = typeLighting[actualKey];
     
-    // Create a softer gradient with more lightness
     return `linear-gradient(135deg, 
       ${lightenColor(colors.backgroundColor, 0.3)}, 
       ${lightenColor(colors.secondaryColor, 0.4)})`;
   }
   
-  // Dual type - create a softer blend for both types
   const primaryTypeKey = types[0].toLowerCase();
   const secondaryTypeKey = types[1].toLowerCase();
   
-  // Find the actual keys with case insensitivity
   const primaryKey = Object.keys(typeLighting).find(key => 
     key.toLowerCase() === primaryTypeKey) || 'normal';
   const secondaryKey = Object.keys(typeLighting).find(key => 
@@ -293,7 +276,6 @@ export const getSofterTypeBackground = (types: string[]): string => {
   const primary = typeLighting[primaryKey];
   const secondary = typeLighting[secondaryKey];
   
-  // Create a gentler gradient that won't compete with the model
   return `linear-gradient(135deg, 
     ${lightenColor(primary.backgroundColor, 0.25)} 0%, 
     ${lightenColor(primary.secondaryColor, 0.4)} 45%, 
@@ -301,20 +283,16 @@ export const getSofterTypeBackground = (types: string[]): string => {
     ${lightenColor(secondary.secondaryColor, 0.4)} 100%)`;
 };
 
-// Helper function to lighten a color for backgrounds
 function lightenColor(color: string, amount: number): string {
   const hex = color.replace('#', '');
   
-  // Convert hex to RGB
   let r = parseInt(hex.substring(0, 2), 16);
   let g = parseInt(hex.substring(2, 4), 16);
   let b = parseInt(hex.substring(4, 6), 16);
   
-  // Lighten
   r = Math.min(255, Math.round(r + (255 - r) * amount));
   g = Math.min(255, Math.round(g + (255 - g) * amount));
   b = Math.min(255, Math.round(b + (255 - b) * amount));
   
-  // Convert back to hex
   return `#${(r.toString(16).padStart(2, '0'))}${(g.toString(16).padStart(2, '0'))}${(b.toString(16).padStart(2, '0'))}`;
 }
