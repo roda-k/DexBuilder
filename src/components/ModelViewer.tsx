@@ -416,36 +416,58 @@ const ModelViewer = ({
   );
 };
 
-export const LazyModelViewer = ({ modelPath, pokemonType, ...props }: ModelViewerProps) => {
+export const LazyModelViewer = ({ modelPath, pokemonType, ...props }: ModelViewerProps & { isScrolling?: boolean }) => {
   const [shouldRender, setShouldRender] = useState(false);
   const [useFallback, setUseFallback] = useState(false);
-  const [fallbackFailed, setFallbackFailed] = useState(false); // track fallback failures
+  const [fallbackFailed, setFallbackFailed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const unloadTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Track if this model is actually visible (more strict than shouldRender)
+  const [isActuallyVisible, setIsActuallyVisible] = useState(false);
   
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    // Outer observer with larger margin to preload
+    const preloadObserver = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
+          // Start loading, but don't unload immediately when scrolled away
           setShouldRender(true);
         } else if (!entry.isIntersecting && shouldRender) {
-          //unload when scrolled away
-          setShouldRender(false);
+          // Delay unloading to prevent flickering during normal scrolling
+          if (unloadTimerRef.current) clearTimeout(unloadTimerRef.current);
+          
+          unloadTimerRef.current = setTimeout(() => {
+            setShouldRender(false);
+          }, 1000); // Keep model loaded for 1 second after scrolling away
         }
       },
-      { rootMargin: '300px 0px' } // to start the loading before coming into view
+      { rootMargin: '300px 0px' } // Generous preloading margin
+    );
+    
+    // Inner observer with tighter margin to determine if truly visible
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        setIsActuallyVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 } // Consider visible when at least 10% is shown
     );
     
     if (containerRef.current) {
-      observer.observe(containerRef.current);
+      preloadObserver.observe(containerRef.current);
+      visibilityObserver.observe(containerRef.current);
     }
     
-    return () => observer.disconnect();
+    return () => {
+      if (unloadTimerRef.current) clearTimeout(unloadTimerRef.current);
+      preloadObserver.disconnect();
+      visibilityObserver.disconnect();
+    };
   }, [shouldRender]);
 
-  // handle model loading errors
+  // Handle model loading errors
   const handleError = () => {
     console.error(`Error loading model: ${modelPath}, using fallback`);
-    // no infinite
     if (!useFallback) {
       setUseFallback(true);
     } else {
@@ -454,11 +476,14 @@ export const LazyModelViewer = ({ modelPath, pokemonType, ...props }: ModelViewe
     }
   };
   
+  // We use the actual visibility to determine whether to animate/render at full quality
+  const renderQuality = isActuallyVisible ? 'high' : 'low';
+  
   return (
     <div ref={containerRef} style={{ height: props.height || '250px', width: '100%' }}>
       {shouldRender ? (
         fallbackFailed ? (
-          // static error element
+          // static error element - unchanged
           <Box sx={{
             height: '100%',
             width: '100%',
@@ -475,12 +500,18 @@ export const LazyModelViewer = ({ modelPath, pokemonType, ...props }: ModelViewe
         ) : (
           <ModelViewer 
             modelPath={useFallback ? '/glbs/0000.glb' : modelPath}
-            pokemonType={pokemonType} // Pass the type
-            onError={handleError} // always pass the handler
+            pokemonType={pokemonType}
+            onError={handleError}
+            // Pass visibility status to control quality
+            lowerDetailWhenIdle={!isActuallyVisible || props.lowerDetailWhenIdle}
+            // Disable auto-rotation when not actually visible
+            autoRotate={isActuallyVisible && props.autoRotate}
+            // Pass through other props
             {...props}
           />
         )
       ) : (
+        // Loading placeholder - unchanged
         <Box sx={{
           height: '100%',
           width: '100%',

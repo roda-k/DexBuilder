@@ -2,118 +2,133 @@ import {
   Box, 
   Container, 
   Typography, 
-  useTheme, 
-  useMediaQuery, 
-  Paper
+  useTheme,
+  Divider
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import TopNavbar from '../components/TopNavbar';
 import ModelGallery from '../components/ModelGallery';
 
 const Pokedex = () => {
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <Box sx={{ 
       display: 'flex', 
       flexDirection: 'column', 
       minHeight: '100vh',
-      // Ensure content order is preserved
-      '& > *': { 
-        order: 'initial' 
-      }
+      backgroundColor: theme.palette.background.default,
+      position: 'relative',
     }}>
       {/* Fixed TopNavbar */}
-      <Box sx={{ 
-        order: 1, // Explicitly set first
-        width: '100%',
-        zIndex: theme.zIndex.appBar
-      }}>
-        <TopNavbar />
-      </Box>
+      <TopNavbar />
       
-      {/* Main content area with landing message first */}
-      <Box 
-        component="main"
-        sx={{
-          order: 2, // Explicitly set second
+      {/* Main content area */}
+      <Container 
+        maxWidth="lg" 
+        sx={{ 
+          pt: 2, 
           flexGrow: 1,
-          width: '100%',
-          backgroundColor: theme.palette.background.default,
-          pt: 2,
+          position: 'relative',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          minHeight: 0
         }}
       >
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-          {/* Landing message - ensure this stays at top */}
-          <Box sx={{ mb: 4, order: 1 }}>
-            <Grid container spacing={4} alignItems="center">
-              <Grid size={{xs:12, md:6}}>
-                <Box sx={{ p: 2 }}>
-                  <Typography 
-                    variant="h2" 
-                    component="h1" 
-                    gutterBottom
-                    sx={{ 
-                      fontWeight: 700, 
-                      fontSize: isSmallScreen ? '2.5rem' : '3.5rem',
-                      color: theme.palette.primary.main // Add red accent to heading
-                    }}
-                  >
-                    Pokémon 3D Gallery
-                  </Typography>
-                  <Typography 
-                    variant="h5" 
-                    sx={{ mb: 4 }}
-                  >
-                    Explore our collection of 3D Pokémon models
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
-
-          {/* Model Gallery - comes after landing message */}
-          <Box sx={{ order: 2, mb: 6 }}>
-            <ModelGallery />
-          </Box>
-
-          {/* Feature cards - come last */}
-          <Box sx={{ order: 3 }}>
-            <Grid container spacing={3} sx={{ mt: 4 }}>
-              {[
-                { title: "Extensive Database", description: "Access comprehensive information about all Pokémon species." },
-                { title: "Build Teams", description: "Create and analyze your perfect Pokémon team." },
-                { title: "Track Collections", description: "Keep track of your Pokémon collection progress." }
-              ].map((feature, index) => (
-                <Grid size={{xs:12, md:4}} key={index}>
-                  <Paper 
-                    elevation={2} 
-                    sx={{ 
-                      p: 3, 
-                      height: '100%',
-                      transition: 'all 0.3s ease',
-                      '&:hover': { 
-                        transform: 'translateY(-5px)',
-                      },
-                      bgcolor: 'background.paper',
-                      borderLeft: index === 0 ? `4px solid ${theme.palette.primary.main}` : 'none'
-                    }}
-                  >
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                      {feature.title}
-                    </Typography>
-                    <Typography variant="body1">
-                      {feature.description}
-                    </Typography>
-                  </Paper>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        </Container>
+        {/* Header and content */}
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 2
+          }}
+        >
+          <Typography 
+            variant="h5" 
+            component="h1"
+            sx={{ 
+              fontWeight: 600,
+              color: theme.palette.primary.main,
+            }}
+          >
+            Pokédex
+          </Typography>
+          
+          <Typography 
+            variant="body2" 
+            color="text.secondary"
+            sx={{ opacity: 0.8 }}
+          >
+            Explore 3D models
+          </Typography>
+        </Box>
+        
+        <Divider sx={{ mb: 3, opacity: 0.6 }} />
+        
+        {/* Model Gallery without glass effect */}
+        <Box 
+          sx={{ 
+            position: 'relative',
+            flexGrow: 1, 
+            display: 'flex',
+            flexDirection: 'column',
+            height: 'calc(100vh - 180px)', 
+            marginLeft: -3,
+            marginRight: -3,
+            paddingLeft: 3,
+            paddingRight: 3,
+          }}
+        >
+          <ModelGallery style={{ height: '100%' }} />
+        </Box>
+      </Container>
+      
+      {/* Dedicated fixed glass effect overlay */}
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '150px',
+          pointerEvents: 'none',
+          zIndex: 100, // Higher z-index to ensure it's on top
+        }}
+      >
+        {/* First layer (subtle gradient) */}
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '100%',
+            background: `linear-gradient(to bottom, 
+              rgba(0,0,0,0) 0%, 
+              rgba(0,0,0,0.05) 20%,
+              rgba(0,0,0,0.1) 40%)`,
+            maskImage: 'linear-gradient(to bottom, transparent, black)',
+            boxShadow: theme.palette.mode === 'dark' 
+              ? 'inset 0 -40px 60px rgba(0,0,0,0.3)' 
+              : 'inset 0 -40px 60px rgba(20,20,20,0.15)',
+            zIndex: 1,
+          }}
+        />
+        
+        {/* Second layer (blur effect) */}
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '120px',
+            backdropFilter: 'blur(8px)',
+            background: 'transparent',
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 100%)',
+            zIndex: 2,
+          }}
+        />
       </Box>
     </Box>
   );

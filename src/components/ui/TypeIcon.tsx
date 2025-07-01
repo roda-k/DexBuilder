@@ -62,4 +62,5 @@ const TypeIcon = ({ type, size = 36, brightnessFactor = 1 }: TypeIconProps) => {
   );
 };
 
+export { TYPE_COLORS };
 export default TypeIcon;
