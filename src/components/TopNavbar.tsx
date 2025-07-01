@@ -23,7 +23,8 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Pokedex', path: '/Pokedex', icon: '/icons/Pokedex.svg' },
+  { label: 'Pokedex', path: '/Pokedex', icon: `${import.meta.env.BASE_URL}icons/Pokedex.svg` },
+  // { label: 'Pokedex', path: '/Pokedex', icon: '/icons/Pokedex.svg' },
   // { label: 'Dashboard', path: '/dashboard' },
   // { label: 'Explore', path: '/explore' },
   // { label: 'Analytics', path: '/analytics' },

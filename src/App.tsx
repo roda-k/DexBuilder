@@ -6,7 +6,7 @@ import AppRouter from './routes/AppRouter';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/DexBuilder">
       <ThemeProvider theme={darkTheme}>
         <CssBaseline />
         <AppRouter />
