@@ -68,8 +68,8 @@ const ModelGallery = ({ style = {} }) => {
             return POKEMON_WITH_VARIANTS[pokemonId].map(variant => ({
               id: `${pokemonId}-${variant}`,
               name: `${pokemon.name} (${variant === 'M' ? 'Male' : 'Female'})`,
-              // modelPath: `/glbs/${pokemonId}-${variant}.glb`, local path
-              modelPath: `${import.meta.env.BASE_URL}glbs/${pokemonId}-${variant}.glb`, //deployment base url
+              modelPath: `/glbs/${pokemonId}-${variant}.glb`,
+              // modelPath: `${import.meta.env.BASE_URL}glbs/${pokemonId}-${variant}.glb`, //deployment base url
               variant,
               apiData: details
             }));
@@ -78,8 +78,8 @@ const ModelGallery = ({ style = {} }) => {
           return [{
             id: pokemonId,
             name: pokemon.name,
-            // modelPath: `/glbs/${pokemonId}.glb`, same here
-            modelPath: `${import.meta.env.BASE_URL}glbs/${pokemonId}.glb`,
+            modelPath: `/glbs/${pokemonId}.glb`,
+            // modelPath: `${import.meta.env.BASE_URL}glbs/${pokemonId}.glb`,
             apiData: details
           }];
         });
