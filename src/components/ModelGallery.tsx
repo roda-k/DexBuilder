@@ -31,7 +31,8 @@ const ModelGallery = ({ style = {} }) => {
   const [models, setModels] = useState<PokemonModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [skippedModels, setSkippedModels] = useState<string[]>([]);
+  // const [skippedModels, setSkippedModels] = useState<string[]>([]);
+  const skippedModels = useRef<string[]>([]).current;
   const [expandedStats, setExpandedStats] = useState<{ [key: string]: boolean }>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredModels, setFilteredModels] = useState<PokemonModel[]>([]);

@@ -216,7 +216,7 @@ const ModelViewer = ({
   position = [0, 0, 0],
   autoRotate = false,
   height = '500px',
-  onError,
+  // onError,
   lowerDetailWhenIdle = false,
   pokemonType = 'normal',
 }: ModelViewerProps) => {
@@ -454,7 +454,7 @@ export const LazyModelViewer = ({ modelPath, pokemonType, ...props }: ModelViewe
   };
   
   // We use the actual visibility to determine whether to animate/render at full quality (need rework)
-  const renderQuality = isActuallyVisible ? 'high' : 'low';
+  // const renderQuality = isActuallyVisible ? 'high' : 'low';
   
   return (
     <div ref={containerRef} style={{ height: props.height || '250px', width: '100%' }}>

@@ -37,7 +37,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = "Search Pokémon by name or number...",
   initialValue = '',
   delay = 300,
-  sx,
+  // sx,
   showTypeFilters = false,
   enableKeyboardShortcuts = true
 }) => {
