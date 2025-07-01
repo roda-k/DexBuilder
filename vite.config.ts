@@ -7,16 +7,16 @@ export default defineConfig({
   plugins: [react()],
   base: '/DexBuilder/', // Important: Use your repo name here
   build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    // Ensure assets are properly processed
+    assetsDir: 'assets',
+    // Ensure entry points are correctly handled
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'index.html'),
-      },
       output: {
-        entryFileNames: 'assets/[name].[hash].js',
-        chunkFileNames: 'assets/[name].[hash].js',
-        assetFileNames: 'assets/[name].[hash].[ext]'
-      }
-    }
+        manualChunks: undefined,
+      },
+    },
   },
   resolve: {
     alias: {
